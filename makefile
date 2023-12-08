@@ -8,7 +8,7 @@ CXXFLAGS = -Wall -g
 TARGET = main
 
 # Source files
-SRCS = main.cpp DirectedWeightedGraph.cpp
+SRCS = main.cpp DirectedWeightedGraph.cpp Edmonds.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
