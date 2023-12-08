@@ -210,6 +210,10 @@ void DirectedWeightedGraph::updateCheapestIncomingEdges(int root)
         // Get all incoming edges to this node
         std::vector<std::tuple<int, int, int>> incomingEdges = getNodeIncomingEdges(i);
 
+        // If no incoming edges, skip
+        if (incomingEdges.empty())
+            continue;
+
         // Find the cheapest incoming edge
         std::tuple<int, int, int> cheapestIncomingEdge = incomingEdges[0];
         for (const auto &edge : incomingEdges)
@@ -220,9 +224,13 @@ void DirectedWeightedGraph::updateCheapestIncomingEdges(int root)
             }
         }
 
-        // Change this edge weight to 0
-        removeEdge(std::get<0>(cheapestIncomingEdge), std::get<1>(cheapestIncomingEdge));
-        addEdge(std::get<0>(cheapestIncomingEdge), std::get<1>(cheapestIncomingEdge), 0);
+        // Subtract the weight of the cheapest incoming edge from all incoming edges to this node in the adjacency list
+        for (const auto &edge : incomingEdges)
+        {
+            // Subtract the weight of the cheapest incoming edge from this edge
+            removeEdge(std::get<0>(edge), std::get<1>(edge));
+            addEdge(std::get<0>(edge), std::get<1>(edge), std::get<2>(edge) - std::get<2>(cheapestIncomingEdge));
+        }
     }
 }
 
@@ -246,13 +254,11 @@ DirectedWeightedGraph DirectedWeightedGraph::contractCycle(std::vector<int> cycl
         // Get every edge that is incoming to this node
         std::vector<std::tuple<int, int, int>> incomingEdges = getNodeIncomingEdges(node);
 
-        // Remove the edges that are within the cycle
-        for (const auto &edge : cycleEdges)
-        {
-            incomingEdges.erase(std::remove_if(incomingEdges.begin(), incomingEdges.end(), [&edge](const std::tuple<int, int, int> &incomingEdge)
-                                               { return std::get<0>(incomingEdge) == edge.first && std::get<1>(incomingEdge) == edge.second; }),
-                                incomingEdges.end());
-        }
+        // Remove the edges that have both nodes in the cycle
+        incomingEdges.erase(std::remove_if(incomingEdges.begin(), incomingEdges.end(), [&cycle](const std::tuple<int, int, int> &incomingEdge)
+                                           { return std::find(cycle.begin(), cycle.end(), std::get<0>(incomingEdge)) != cycle.end() &&
+                                                    std::find(cycle.begin(), cycle.end(), std::get<1>(incomingEdge)) != cycle.end(); }),
+                            incomingEdges.end());
 
         // Add the remaining edges incoming to this node to the incoming edges to the cycle
         incomingEdgesToCycle.insert(incomingEdgesToCycle.end(), incomingEdges.begin(), incomingEdges.end());

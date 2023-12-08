@@ -76,5 +76,37 @@ int main()
     }
     std::cout << std::endl;
 
+    // Contract the cycle
+    DirectedWeightedGraph contractedGraph = graph.contractCycle(cycle);
+
+    // Print the contracted graph
+    std::cout << "Contracted graph: " << std::endl;
+    contractedGraph.printGraph();
+
+    // Get the minimum incoming edges graph
+    contractedGraph.updateCheapestIncomingEdges(0);
+
+    // Print the minimum incoming edges graph
+    std::cout << "Minimum incoming edges graph: " << std::endl;
+    contractedGraph.printGraph();
+
+    // Find a 0-cost cycle
+    std::vector<int> cycle2 = contractedGraph.getCycleNodes();
+
+    // Print the cycle
+    std::cout << "Cycle: ";
+    for (long unsigned int i = 0; i < cycle2.size(); i++)
+    {
+        std::cout << cycle2[i] << " ";
+    }
+    std::cout << std::endl;
+
+    // Contract the cycle
+    DirectedWeightedGraph contractedGraph2 = contractedGraph.contractCycle(cycle2);
+
+    // Print the contracted graph
+    std::cout << "Contracted graph: " << std::endl;
+    contractedGraph2.printGraph();
+
     return 0;
 }
